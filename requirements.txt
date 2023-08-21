@@ -52,7 +52,6 @@ h5py==3.8.0
 matplotlib==3.7.1
 anyio==3.5.0
 Markdown==3.4.3
-conda-verify==3.4.2
 idna==3.4
 opt-einsum==3.3.0
 oauthlib==3.2.2
