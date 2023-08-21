@@ -1,0 +1,20 @@
+#!/bin/sh
+#PBS -N perturb_experiment
+#PBS -q serial
+#PBS -P CSCI1166
+#PBS -l select=1:ncpus=23:mem=120gb
+#PBS -l walltime=12:00:00
+#PBS -o /mnt/lustre/users/hvandeventer/stdoutput.out
+#PBS -e /mnt/lustre/users/hvandeventer/stderror.err
+#PBS -m abe -M 15008763@tuks.co.za
+ulimit -s unlimited
+
+# Move to the directory of interest
+cd /mnt/lustre/users/hvandeventer/perturb_experiment
+
+# can activate your pip environment here
+module load chpc/python/anaconda/3-2021.11
+source /mnt/lustre/users/hvandeventer/perturb_experiment/myenv/bin/activate 
+
+# Run your script
+python /mnt/lustre/users/hvandeventer/perturb_experiment/msc_perturbation_experiment/perturb_experiment_main.py
