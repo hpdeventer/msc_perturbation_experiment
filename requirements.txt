@@ -5,7 +5,6 @@ memory-profiler==0.61.0
 certifi==2023.5.7
 tzdata==2023.3
 pytz==2022.7
-pywin32==305.1
 setuptools==65.6.3
 cryptography==39.0.1
 pyzmq==25.1.0
