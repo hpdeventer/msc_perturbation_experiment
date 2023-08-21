@@ -9,7 +9,6 @@ setuptools==65.6.3
 cryptography==39.0.1
 pyzmq==25.1.0
 flatbuffers==23.5.26
-conda==23.5.0
 pip==23.1.2
 boltons==23.0.0
 packaging==23.0
