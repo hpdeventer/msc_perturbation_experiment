@@ -45,7 +45,6 @@ rsa==4.9
 typing-extensions==4.6.3
 bleach==4.1.0
 chardet==4.0.0
-conda-build==3.24.0
 protobuf==3.19.6
 ply==3.11
 filelock==3.9.0
