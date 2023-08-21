@@ -56,12 +56,12 @@ def create_progress_file(input_dim, partition, start_timestamp, end_timestamp):
 
 def parallel_execute():
     # List of trial numbers, optimizers, and boolean values for use_pseudorehearsal
-    trial_numbers = list(range(2))
+    trial_numbers = list(range(30))
     optimizers = ['adam', 'sgd']
     pseudorehearsals = [True, False]
 
-    for input_dim in range(1, 3):
-        for partition in range(1, 4):
+    for input_dim in range(1, 6):
+        for partition in range(1, 10):
             # Capture the start timestamp for this combination of input_dim and partition
             start_timestamp = datetime.now()
             
