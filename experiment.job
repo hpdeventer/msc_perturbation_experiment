@@ -6,7 +6,7 @@
 #PBS -l walltime=2:00:00
 #PBS -o /mnt/lustre/users/hvandeventer/perturb_experiment/stdoutput.out
 #PBS -e /mnt/lustre/users/hvandeventer/perturb_experiment/stderror.err
-#PBS -m abe -M 15008763@tuks.co.za
+#PBS -m abe -M u15008763@tuks.co.za
 ulimit -s unlimited
 
 # Move to the directory of interest
