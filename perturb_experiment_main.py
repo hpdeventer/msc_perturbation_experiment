@@ -31,3 +31,4 @@ experiment_arguments = {
 
 # Execute the experiment
 basic_perturbation_experiment(**experiment_arguments)
+print("great success")
