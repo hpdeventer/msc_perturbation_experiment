@@ -99,11 +99,18 @@ if __name__ == "__main__":
     print(f"Total Execution Time: {time.time() - overall_start_time} seconds")
 '''
 
-import time
+"""import time
 import numpy as np
 import os
 from multiprocessing import Pool
+import gc"""
+
+import time
+import numpy as np
+import os
 import gc
+from concurrent.futures import ProcessPoolExecutor
+
 
 def wrapper(args):
     basic_perturbation_experiment(**args)
@@ -163,12 +170,35 @@ def process_combination(args):
                 }
                 experiments.append(experiment_arguments)
 
-    with Pool() as pool:
-        pool.map(wrapper, experiments)
+    with ProcessPoolExecutor() as executor:
+        executor.map(wrapper, experiments)
 
     aggregate_and_save(input_dim, partition, optimizers, pseudorehearsals, trial_numbers)
 
-if __name__ == "__main__":
+
+"""def process_combination(args):
+    input_dim, partition, trial_numbers, optimizers, pseudorehearsals = args
+    experiments = []
+    for trial in trial_numbers:
+        for optimizer in optimizers:
+            for use_pseudorehearsal in pseudorehearsals:
+                experiment_arguments = {
+                    'trial_number': trial,
+                    'input_dimension': input_dim,
+                    'partition_number': partition,
+                    'use_pseudorehearsal': use_pseudorehearsal,
+                    'loss_function': 'mse',
+                    'verbose': 0,
+                    'optimizer': optimizer
+                }
+                experiments.append(experiment_arguments)
+
+    with Pool() as pool:
+        pool.map(wrapper, experiments)
+
+    aggregate_and_save(input_dim, partition, optimizers, pseudorehearsals, trial_numbers)"""
+
+"""if __name__ == "__main__":
     start_time = time.time()
 
     trial_numbers = list(range(3))
@@ -180,5 +210,21 @@ if __name__ == "__main__":
 
     with Pool() as pool:
         pool.map(process_combination, combinations)
+
+    print(f"Execution Time: {time.time() - start_time} seconds")"""
+
+
+if __name__ == "__main__":
+    start_time = time.time()
+
+    trial_numbers = list(range(31))
+    optimizers = ['adam', 'sgd']
+    pseudorehearsals = [True, False]
+    combinations = [(input_dim, partition, trial_numbers, optimizers, pseudorehearsals)
+                    for input_dim in range(1, 7)
+                    for partition in range(1, 11)]
+
+    with ProcessPoolExecutor() as executor:
+        executor.map(process_combination, combinations)
 
     print(f"Execution Time: {time.time() - start_time} seconds")
