@@ -171,12 +171,12 @@ def process_combination(args):
 if __name__ == "__main__":
     start_time = time.time()
 
-    trial_numbers = list(range(31))
+    trial_numbers = list(range(3))
     optimizers = ['adam', 'sgd']
     pseudorehearsals = [True, False]
     combinations = [(input_dim, partition, trial_numbers, optimizers, pseudorehearsals)
-                    for input_dim in range(1, 7)
-                    for partition in range(1, 11)]
+                    for input_dim in range(1, 3) #7
+                    for partition in range(1, 3)] #11
 
     with Pool() as pool:
         pool.map(process_combination, combinations)
