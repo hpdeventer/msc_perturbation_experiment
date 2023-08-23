@@ -2,8 +2,8 @@
 #PBS -N perturb_experiment
 #PBS -q serial
 #PBS -P CSCI1166
-#PBS -l select=1:ncpus=23:mem=240gb
-#PBS -l walltime=1:00:00
+#PBS -l select=1:ncpus=23:mem=90gb
+#PBS -l walltime=1:30:00
 #PBS -o /mnt/lustre/users/hvandeventer/perturb_experiment/stdoutput.out
 #PBS -e /mnt/lustre/users/hvandeventer/perturb_experiment/stderror.err
 #PBS -m abe -M u15008763@tuks.co.za
