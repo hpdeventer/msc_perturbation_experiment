@@ -100,46 +100,6 @@ def load_and_save_data(input_dim=2,
     save_path = f"{save_folder}/data_input_dim_{input_dim}_partition_{partition}.npy"
     np.save(save_path, data)
 
-
-"""def aggregate_and_save(input_dim, partition, optimizers, pseudorehearsals, trial_numbers):
-    aggregated_results = {}
-
-    for trial in trial_numbers:
-        for optimizer in optimizers:
-            for use_pseudorehearsal in pseudorehearsals:
-                base_folder = f"results/input_dim_{input_dim}_partition_num_{partition}_{use_pseudorehearsal}_{optimizer}/trial_{trial}"
-
-                key = f"{input_dim}_{partition}_{use_pseudorehearsal}_{optimizer}"
-                if key not in aggregated_results:
-                    aggregated_results[key] = {}
-                aggregated_results[key][trial] = {}
-                
-                for i in range(partition):
-                    for data_name, file_name in [('model_output_prior_training', 'output_prior_training.npy'),
-                                                 ('model_output_after_training', 'output_after_training.npy'),
-                                                 ('absolute_perturbation', 'absolute_perturbation.npy')]:
-                        data_path = f"{base_folder}/model_outputs/model_{i}/{file_name}"
-                        if os.path.exists(data_path):
-                            aggregated_results[key][trial][data_name] = np.load(data_path)
-                
-                for data_name, file_name in [('min_distances', 'min_distances.npy'),
-                                             ('max_distances', 'max_distances.npy')]:
-                    data_path = f"{base_folder}/distances/{file_name}"
-                    if os.path.exists(data_path):
-                        aggregated_results[key][trial][data_name] = np.load(data_path)
-
-                # Clear memory for this iteration
-                del base_folder
-
-    if not os.path.exists("aggregated_results"):
-        os.makedirs("aggregated_results")
-    np.save(f"aggregated_results/data_input_dim_{input_dim}_partition_{partition}.npy", aggregated_results)
-    
-    # Clear memory
-    del aggregated_results
-    gc.collect()"""
-
-
 def prepare_experiments(args):
     input_dim, partition, trial_numbers, optimizers, pseudorehearsals = args
     experiments = []
