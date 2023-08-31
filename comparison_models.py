@@ -6,7 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Embedding, Reshape, RepeatVector, Multiply, Dense
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 
-def initialize_models(input_dimension: int, 
+def initialize_all_models(input_dimension: int, 
                       partition_number: int, 
                       seed_val: int, 
                       output_dim: int = 1,
@@ -23,11 +23,11 @@ def initialize_models(input_dimension: int,
 
     return [
         LookupTableModel(partition_num=partition_number, default_val=-1., **common_args), 
-        ASESANN(partition_num=partition_number, num_exps=num_exps, **common_args),
+        ANNEXSpline(partition_num=partition_number, num_exps=num_exps, **common_args),
         create_linear_model(**common_args),
         create_wide_relu_ann(hidden_units=hidden_units_wide, **common_args),
         create_deep_relu_ann(hidden_units=hidden_units_deep, hidden_layers=hidden_layers, **common_args),
-        LookupTableModel(partition_num=1, default_val=-1., **common_args)  # Adding the constant model
+        LookupTableModel(partition_num=1, default_val=-1., **common_args)  # constant model
     ]
 
 def create_linear_model(input_dim: int, output_dim: int = 1, seed: int = 42) -> Sequential:
@@ -139,21 +139,21 @@ class LookupTableModel(tf.keras.Model):
         outputs = self.embedding(safe_indices)
         return outputs
 
-# Pronounced "assassin" Anti-Symmetric Exponential Spline Additive Neural Network
-class ASESANN(keras.Model):
+
+class ANNEXSpline(keras.Model):
     """
-    ASESANN Class for Anti-Symmetric Exponential Spline Additive Neural Network.
+    ANNEXSpline Class for Anti-Symmetric Exponential Spline Additive Neural Network.
     """
     def __init__(self, input_dim: int, partition_num: int, num_exps: int, output_dim: int, seed: int = 55, **kwargs):
         """
-        Initialize the ASESANN model.
+        Initialize the ANNEXSpline model.
 
         :param input_dim: Dimension of the input data
         :param partition_num: Number of partitions
         :param num_exps: Number of exponential terms
         :param output_dim: Output dimension
         """
-        super(ASESANN, self).__init__(**kwargs)
+        super(ANNEXSpline, self).__init__(**kwargs)
         
         # Setting up the model parameters
         self.input_dim, self.partition_num, self.num_exps, self.output_dim = input_dim, partition_num, num_exps, output_dim
@@ -191,13 +191,13 @@ class ASESANN(keras.Model):
 
     def repartition(self, new_partition_num):
         """
-        Create a new ASESANN model with a different number of partitions.
+        Create a new ANNEXSpline model with a different number of partitions.
 
         :param new_partition_num: Number of partitions for the new model
-        :return: A new instance of the ASESANN model
+        :return: A new instance of the ANNEXSpline model
         """
         # Creating a new model with the new partition number
-        new_model = ASESANN(input_dim=self.input_dim, partition_num=new_partition_num, num_exps=self.num_exps, output_dim=self.output_dim)
+        new_model = ANNEXSpline(input_dim=self.input_dim, partition_num=new_partition_num, num_exps=self.num_exps, output_dim=self.output_dim)
         new_model.build(input_shape=(None,self.input_dim))
         
         # Transferring weights from old to new model
@@ -237,7 +237,7 @@ def cubic_spline(x: tf.Tensor) -> tf.Tensor:
     :return: Output tensor with cubic spline transformation
     """
     conditions = [tf.math.logical_and(i <= x, x < i + 1) for i in range(4)]
-    polynomials = [
+    polynomials = [7
         x**3/6,
         (-3.*(x-1.)**3 +3.*(x-1.)**2 + 3*(x-1.)+1.)/6.,
         (3*(x-2)**3 - 6*(x-2)**2 + 4. )/6.,
