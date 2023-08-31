@@ -20,8 +20,6 @@ def initialize_all_models(input_dimension: int,
         'seed': seed_val
     }
 
-    models = []
-
     models = [
         create_linear_model(**common_args),
         create_wide_relu_ann(hidden_units=hidden_units_wide, **common_args),
