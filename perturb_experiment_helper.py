@@ -77,9 +77,8 @@ def save_data(data: np.ndarray, folder_name: str, file_name: str) -> None:
     except Exception as e:
         print(f"Error saving data: {e}")
 
-def basic_perturbation_experiment(trial_number: int, 
+def perturbation_experiment(trial_number: int, 
                                   input_dimension: int, 
-                                  partition_number: int, 
                                   epochs: int = 20, 
                                   batch_size: int = 128, 
                                   use_pseudorehearsal: bool = False,
@@ -91,7 +90,6 @@ def basic_perturbation_experiment(trial_number: int,
     Args:
     - trial_number (int): Identifier for the trial.
     - input_dimension (int): Dimension of the input space.
-    - partition_number (int): Number of partitions.
     - epochs (int, optional): Number of training epochs. Default is 20.
     - batch_size (int, optional): Size of training batch. Default is 128.
     - pseudo_rehearse (bool, optional): Whether to use pseudorehearsal. Default is False.
@@ -105,15 +103,14 @@ def basic_perturbation_experiment(trial_number: int,
     tf.random.set_seed(seed_val)
 
     # Initialize models based on the given configurations
-    models = initialize_models(input_dimension, partition_number, seed_val)
+    models = initialize_all_models(input_dimension, seed_val)
 
     # Generate training data by repeating a specific point and its corresponding target
     
     point_of_interest = rng.uniform(0, 1, size=(1, input_dimension))
     random_target_value = rng.standard_normal(size=(1, 1))
     
-    base_folder = f"results/input_dim_{input_dimension}_partition_num_{partition_number}_{use_pseudorehearsal}_\
-{optimizer}/trial_{trial_number}"
+    base_folder = f"results/input_dim_{input_dimension}_{use_pseudorehearsal}_{optimizer}/trial_{trial_number}"
     
     x_train = np.repeat(point_of_interest, NUM_TRAIN_POINTS, axis=0)
     y_train = np.repeat(random_target_value, NUM_TRAIN_POINTS, axis=0)
