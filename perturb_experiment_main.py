@@ -12,8 +12,8 @@ warnings.filterwarnings('ignore')
 
 start_time = time.time()
 
-max_num_trials = 2
-trial_chunks = 2
+max_num_trials = 30
+trial_chunks = 3
 
 if __name__ == "__main__":
     optimizers = ['adam', 'sgd']
