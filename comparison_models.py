@@ -7,13 +7,12 @@ from tensorflow.keras.layers import Conv1D, Embedding, Reshape, RepeatVector, Mu
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 
 def initialize_all_models(input_dimension: int, 
-                      partition_number: int, 
-                      seed_val: int, 
-                      output_dim: int = 1,
-                      hidden_units_wide: int = 1000,
-                      hidden_units_deep: int = 16,
-                      hidden_layers: int = 8,
-                      num_exps: int = 6) -> list:
+                          seed_val: int, 
+                          output_dim: int = 1,
+                          hidden_units_wide: int = 1000,
+                          hidden_units_deep: int = 16,
+                          hidden_layers: int = 8,
+                          num_exps: int = 6) -> list:
     """Initialize models with given configurations."""
     common_args = {
         'input_dim': input_dimension, 
@@ -21,14 +20,20 @@ def initialize_all_models(input_dimension: int,
         'seed': seed_val
     }
 
-    return [
-        LookupTableModel(partition_num=partition_number, default_val=-1., **common_args), 
-        ANNEXSpline(partition_num=partition_number, num_exps=num_exps, **common_args),
+    models = []
+
+    for partition_number in range(1, 11):
+        models.append(LookupTableModel(partition_num=partition_number, default_val=-1., **common_args))
+        models.append(ANNEXSpline(partition_num=partition_number, num_exps=num_exps, **common_args))
+    
+    models.extend([
         create_linear_model(**common_args),
         create_wide_relu_ann(hidden_units=hidden_units_wide, **common_args),
         create_deep_relu_ann(hidden_units=hidden_units_deep, hidden_layers=hidden_layers, **common_args),
         LookupTableModel(partition_num=1, default_val=-1., **common_args)  # constant model
-    ]
+    ])
+
+    return models
 
 def create_linear_model(input_dim: int, output_dim: int = 1, seed: int = 42) -> Sequential:
     """Create a linear model with rescaling and a dense layer.
@@ -159,7 +164,7 @@ class ANNEXSpline(keras.Model):
         self.input_dim, self.partition_num, self.num_exps, self.output_dim = input_dim, partition_num, num_exps, output_dim
         
         # Direct Spline Additive Neural Network (SAM)
-        self.direct_sam = SplineAdditiveNeuralNetwork(input_dim=self.input_dim, 
+        self.direct_sam = SplineANN(input_dim=self.input_dim, 
                                                       output_dim=self.output_dim, 
                                                       partition_num=self.partition_num,
                                                       seed=hash("Direct: " + str(seed)) % (2**32))
@@ -167,7 +172,7 @@ class ANNEXSpline(keras.Model):
         # Anti-Symmetric Exponential layer, if there are exponential terms
         if self.num_exps > 0:
             self.anti_symmetric_exponential_layer = AntiSymmetricExponential(num_exps=num_exps, output_dim=output_dim)
-            self.indirect_sam = SplineAdditiveNeuralNetwork(input_dim=input_dim,
+            self.indirect_sam = SplineANN(input_dim=input_dim,
                                                             output_dim=int(2*num_exps*output_dim), 
                                                             partition_num=partition_num,
                                                             seed=hash("Indirect: " + str(seed)) % (2**32))
@@ -250,9 +255,9 @@ def floormod_activation(x: tf.Tensor) -> tf.Tensor:
     """Applies floor modulus 1 to a given Tensor."""
     return tf.math.floormod(x, 1.)
 
-class SplineAdditiveNeuralNetwork(keras.Model):
+class SplineANN(keras.Model):
     def __init__(self, input_dim: int, output_dim: int, partition_num: int,  seed: int = 55, **kwargs):
-        super(SplineAdditiveNeuralNetwork, self).__init__()
+        super(SplineANN, self).__init__()
         self.input_dim = input_dim 
         self.output_dim = output_dim
         self.density = 4*partition_num + 3
@@ -317,7 +322,7 @@ class SplineAdditiveNeuralNetwork(keras.Model):
     # every output dimension has its own dimension... That is why the shape is not correct
     def repartition(self, partition_num):
         old_weights = self.control_points.get_weights()[0]
-        new_model = SplineAdditiveNeuralNetwork(self.input_dim, self.output_dim, partition_num)
+        new_model = SplineANN(self.input_dim, self.output_dim, partition_num)
         #new_model.construct()
         new_model.build(input_shape=(None,self.input_dim)) #change did not fix warning
         new_weights = new_model.control_points.get_weights()[0]
