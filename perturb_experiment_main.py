@@ -18,7 +18,7 @@ trial_chunks = 3
 if __name__ == "__main__":
     optimizers = ['adam', 'sgd']
     pseudorehearsals = [True, False]
-    input_dimensions = [x for x in range(1,2)]
+    input_dimensions = [x for x in range(1,7)]
     trial_numbers = list(range(max_num_trials))
 
     # Split the trial_numbers into 3 roughly equal parts
