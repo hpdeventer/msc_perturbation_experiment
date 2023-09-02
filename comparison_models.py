@@ -31,7 +31,7 @@ def initialize_all_models(input_dimension: int,
     for partition_num in [1,2,4,8,10]:
         models.append(SplineANN(partition_num=partition_num, **common_args))
         models.append(LookupTableModel(partition_num=partition_num, default_val=-1., **common_args))
-        models.append(ANNEXSpline(partition_num=partition_num, num_exps=num_exps, **common_args))
+        models.append(ABELSpline(partition_num=partition_num, num_exps=num_exps, **common_args))
 
     return models
 
@@ -145,20 +145,20 @@ class LookupTableModel(tf.keras.Model):
         return outputs
 
 
-class ANNEXSpline(keras.Model):
+class ABELSpline(keras.Model):
     """
-    ANNEXSpline Class for Anti-Symmetric Exponential Spline Additive Neural Network.
+    ABELSpline Class for Anti-Symmetric Exponential Spline Additive Neural Network.
     """
     def __init__(self, input_dim: int, partition_num: int, num_exps: int, output_dim: int, seed: int = 55, **kwargs):
         """
-        Initialize the ANNEXSpline model.
+        Initialize the ABELSpline model.
 
         :param input_dim: Dimension of the input data
         :param partition_num: Number of partitions
         :param num_exps: Number of exponential terms
         :param output_dim: Output dimension
         """
-        super(ANNEXSpline, self).__init__(**kwargs)
+        super(ABELSpline, self).__init__(**kwargs)
         
         # Setting up the model parameters
         self.input_dim, self.partition_num, self.num_exps, self.output_dim = input_dim, partition_num, num_exps, output_dim
@@ -196,13 +196,13 @@ class ANNEXSpline(keras.Model):
 
     def repartition(self, new_partition_num):
         """
-        Create a new ANNEXSpline model with a different number of partitions.
+        Create a new ABELSpline model with a different number of partitions.
 
         :param new_partition_num: Number of partitions for the new model
-        :return: A new instance of the ANNEXSpline model
+        :return: A new instance of the ABELSpline model
         """
         # Creating a new model with the new partition number
-        new_model = ANNEXSpline(input_dim=self.input_dim, partition_num=new_partition_num, num_exps=self.num_exps, output_dim=self.output_dim)
+        new_model = ABELSpline(input_dim=self.input_dim, partition_num=new_partition_num, num_exps=self.num_exps, output_dim=self.output_dim)
         new_model.build(input_shape=(None,self.input_dim))
         
         # Transferring weights from old to new model
