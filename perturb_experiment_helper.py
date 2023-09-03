@@ -1,5 +1,6 @@
 # Standard library imports
 import os
+from typing import Dict, Union
 #import logging
 #import warnings
 import gc
@@ -20,74 +21,108 @@ NUM_TEST_POINTS = 5_000
 NUM_TRAIN_POINTS = 5_000 # must be more than pseudo_samples
 NUM_PSEUDO_SAMPLES = 3500
 
-def load_and_save_data(input_dim=2, 
-                       use_pseudorehearsal=False, 
-                       optimizer='sgd', 
-                       trials=30, 
-                       num_models=6):
+
+def load_data_create_dict(input_dim: int, 
+                          use_pseudorehearsal: bool , 
+                          optimizer: str , 
+                          trials: int , 
+                          num_models: int) -> Dict[str, Union[np.ndarray, None]]:
     """
-    Load and save data from specified trials and models to a folder.
+    Load data for specified trials and models from a structured directory and 
+    return it as a dictionary.
     
     Parameters:
-    - input_dim (int): Input dimension.
-    - use_pseudorehearsal (bool): Whether pseudo rehearsal is used.
-    - optimizer (str): Type of optimizer.
-    - trials (int): Number of trials.
-    - num_models (int): Number of models.
+    ----------
+    input_dim : int
+        Input dimension.
+    use_pseudorehearsal : bool
+        Whether pseudo rehearsal is used.
+    optimizer : str
+        Type of optimizer ('sgd', etc.).
+    trials : int
+        Number of trials.
+    num_models : int
+        Number of models.
+
+    Returns:
+    -------
+    dict
+        A dictionary containing concatenated min and max distances and model 
+        perturbations for each trial and model.
     """
+    
     base_folder = f"results/input_dim_{input_dim}_{use_pseudorehearsal}_{optimizer}"
 
-    # Initialize the main data storage with the desired structure
+    # Initialize the dictionary with keys for min_distance, max_distance, and model perturbations
     data = {
         "min_distance": [],
-        "max_distance": []
+        "max_distance": [],
+        **{f"model_{j}_perturbations": [] for j in range(num_models)}
     }
-
-    for j in range(num_models):
-        data[f"model_{j}_perturbations"] = []
 
     for i in range(trials):
         trial_folder = f"{base_folder}/trial_{i}"
 
-        min_distance_path = f"{trial_folder}/distances/min_distances.npy"
-        max_distance_path = f"{trial_folder}/distances/max_distances.npy"
+        paths = {
+            "min_distance": f"{trial_folder}/distances/min_distances.npy",
+            "max_distance": f"{trial_folder}/distances/max_distances.npy",
+            **{f"model_{j}_perturbations": f"{trial_folder}/perturbations/model_{j}/absolute_perturbation.npy" for j in range(num_models)}
+        }
 
-        # Load the distances from the numpy files
-        if os.path.exists(min_distance_path):
-            min_distance = np.load(min_distance_path)
-            data["min_distance"].append(min_distance)
-        else:
-            print(f"Warning: {min_distance_path} not found.")
-
-        if os.path.exists(max_distance_path):
-            max_distance = np.load(max_distance_path)
-            data["max_distance"].append(max_distance)
-        else:
-            print(f"Warning: {max_distance_path} not found.")
-
-        for j in range(num_models):
-            perturbation_path = f"{trial_folder}/perturbations/model_{j}/absolute_perturbation.npy"
-
-            # Load the perturbation from the numpy file
-            if os.path.exists(perturbation_path):
-                perturbation_data = np.load(perturbation_path)
-                data[f"model_{j}_perturbations"].append(perturbation_data)
+        for key, path in paths.items():
+            if os.path.exists(path):
+                data[key].append(np.load(path))
             else:
-                print(f"Warning: {perturbation_path} not found.")
+                print(f"Warning: {path} not found.")
 
     # Convert lists of numpy arrays to a single concatenated numpy array
-    for key in data:
-        if data[key]:  # Check if the list is not empty
-            data[key] = np.concatenate(data[key], axis=0).flatten()
-        else:
-            data[key] = None  # Set the value to None if the list is empty
+    for key, value in data.items():
+        data[key] = np.concatenate(value, axis=0).flatten() if value else None
+                
+    return data
+
+def save_aggregated_data(input_dim: int, 
+                         use_pseudorehearsal: bool, 
+                         optimizer: str, 
+                         trials: int, 
+                         num_models: int) -> None:
+    """
+    Save aggregated data to a numpy file for specified parameters.
+
+    The function aggregates data based on the provided parameters and 
+    saves it in a structured directory named 'aggregated_results'.
+
+    Parameters:
+    ----------
+    input_dim : int
+        Input dimension.
+    use_pseudorehearsal : bool
+        Whether pseudo rehearsal is used.
+    optimizer : str
+        Type of optimizer ('sgd', etc.).
+    trials : int
+        Number of trials. Aggregation is done over 0 to this parameter the (max) number of trials
+    num_models : int
+        Number of models.
+
+    Returns:
+    -------
+    None
+    """
+    
+    base_folder = f"results/input_dim_{input_dim}_{use_pseudorehearsal}_{optimizer}"
+
     # Save the data
     save_folder = "aggregated_results"
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
-    save_path = f"{save_folder}/data_input_dim_{input_dim}.npy"
+    save_path = f"{save_folder}/input_dim_{input_dim}_{use_pseudorehearsal}_{optimizer}.npy"
+    
+    # Fetch the aggregated data
+    data = load_data_create_dict(input_dim, use_pseudorehearsal, optimizer, trials, num_models)
+    
+    # Save the data to the specified path
     np.save(save_path, data)
-
 
 def pseudorehearsal(input_dim: int, num_samples: int, 
                     model: tf.keras.Model, 

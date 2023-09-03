@@ -5,20 +5,20 @@ import numpy as np
 import gc
 from concurrent.futures import ProcessPoolExecutor
 from comparison_models import *
-from perturb_experiment_helper import *
+from perturb_experiment_helper import * 
 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 warnings.filterwarnings('ignore')
 
 start_time = time.time()
 
-max_num_trials = 30
-trial_chunks = 3
+max_num_trials = 3
+trial_chunks = 1
 
 if __name__ == "__main__":
     optimizers = ['adam', 'sgd']
     pseudorehearsals = [True, False]
-    input_dimensions = [x for x in range(1,7)]
+    input_dimensions = [x for x in range(1,3)]
     trial_numbers = list(range(max_num_trials))
 
     # Split the trial_numbers into 3 roughly equal parts
@@ -46,10 +46,10 @@ if __name__ == "__main__":
     for optimizer in optimizers:
         for use_pseudorehearsal in pseudorehearsals:
             for input_dimension in input_dimensions:
-                load_and_save_data(input_dim=input_dimension,
-                                   use_pseudorehearsal=use_pseudorehearsal,
-                                   optimizer=optimizer,
-                                   trials=max_num_trials,
-                                   num_models=19)
+                save_aggregated_data(input_dim=input_dimension,
+                                    use_pseudorehearsal=use_pseudorehearsal,
+                                    optimizer=optimizer,
+                                    trials=max_num_trials,
+                                    num_models=19)
 
     print(f"Execution Time: {time.time() - start_time} seconds")
