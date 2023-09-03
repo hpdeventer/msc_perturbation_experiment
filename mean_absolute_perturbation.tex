@@ -1,0 +1,18 @@
+\begin{table}
+\centering
+\caption{Mean Absolute Perturbation}
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{6}{c}{Input Dimension} \\ 
+\cmidrule(lr){2-7} 
+Model & 1 & 2 & 3 & 4 & 5 & 6 \\ 
+\midrule
+Linear Model & 1.35 & 1.30 & 1.15 & 1.17 & 0.51 & 0.28 & 0.15 & 0.08 & 0.07 & 0.50 & 0.27 & 0.14 & 0.08 & 0.06 & 1.35 & 0.67 & 0.33 & 0.16 & 0.13 \\
+Wide ReLU ANN & 1.12 & 1.01 & 0.94 & 0.87 & 0.50 & 0.28 & 0.14 & 0.07 & 0.06 & 0.51 & 0.28 & 0.13 & 0.07 & 0.05 & 1.12 & 0.27 & 0.07 & 0.02 & 0.01 \\
+Deep ReLU ANN & 0.94 & 0.90 & 0.57 & 0.53 & 0.44 & 0.23 & 0.12 & 0.06 & 0.05 & 0.41 & 0.22 & 0.11 & 0.06 & 0.05 & 0.94 & 0.12 & 0.01 & 0.00 & 0.00 \\
+One Parameter & \textbf{0.54} & \textbf{0.53} & \textbf{0.31} & 0.45 & \textbf{0.22} & \textbf{0.12} & \textbf{0.06} & \textbf{0.03} & \textbf{0.03} & \textbf{0.24} & \textbf{0.11} & \textbf{0.06} & \textbf{0.03} & \textbf{0.03} & \textbf{0.54} & 0.03 & 0.00 & 0.00 & 0.00 \\
+Spline ANN (z=1) & 0.63 & 0.62 & 0.51 & \textbf{0.21} & 0.30 & 0.16 & 0.08 & 0.04 & 0.03 & 0.25 & 0.14 & 0.08 & 0.04 & 0.03 & 0.63 & 0.02 & 0.00 & \textbf{0.00} & \textbf{0.00} \\
+Lookup Table (z=1) & 0.95 & 0.95 & 0.59 & 0.42 & 0.41 & 0.22 & 0.12 & 0.06 & 0.05 & 0.39 & 0.23 & 0.11 & 0.06 & 0.05 & 0.95 & \textbf{0.02} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} \\
+\bottomrule
+\end{tabular}
+\end{table}
