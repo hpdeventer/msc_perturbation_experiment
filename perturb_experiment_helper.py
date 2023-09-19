@@ -231,7 +231,7 @@ def perturbation_experiment(trial_number: int,
     for i, model in enumerate(models):
         outputs_prior.append(model.predict(random_test_points, verbose=verbose))
         #model.summary()
-        model.compile(optimizer='sgd', loss=loss_function)
+        model.compile(optimizer=optimizer, loss=loss_function)
         
         # Choose between regular training and pseudorehearsal augmented training
         if not use_pseudorehearsal:
